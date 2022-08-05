@@ -18,40 +18,128 @@ class _CryptoListPageState extends State<CryptoListPage> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
+  TextEditingController inputController = TextEditingController();
+  bool isLoading = false;
+  @override
+  void dispose() {
+    super.dispose();
+    inputController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      key: _refreshIndicatorKey,
-      color: Colors.white,
-      backgroundColor: Colors.blue,
-      strokeWidth: 4.0,
-      onRefresh: () async {
-        List<CryptoList> freshData = await _getData();
-        setState(() {
-          widget.cryptoList = freshData;
-        });
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: blackColor,
-          centerTitle: true,
-          title: Text(
-            'کریپتو بازار',
-            style: TextStyle(
-              fontFamily: "mrb",
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: blackColor,
+        centerTitle: true,
+        title: Text(
+          'کریپتو بازار',
+          style: TextStyle(
+            fontFamily: "mrb",
+          ),
+        ),
+        automaticallyImplyLeading: false,
+      ),
+      backgroundColor: blackColor,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontFamily: 'mrb',
+                color: blackColor,
+              ),
+              controller: inputController,
+              onChanged: (value) async {
+                List<CryptoList> res = [];
+                res = widget.cryptoList!
+                    .where(
+                      (crypto) => crypto.name
+                          .toLowerCase()
+                          .contains(value.toLowerCase()),
+                    )
+                    .toList();
+
+                setState(() {
+                  widget.cryptoList = res;
+                });
+                if (inputController.text == '') {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  var result = await _getData();
+                  setState(() {
+                    isLoading = false;
+                    widget.cryptoList = result;
+                  });
+                  return;
+                }
+              },
+              decoration: InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(
+                    color: greenColor,
+                    width: 0,
+                  ),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide(
+                    color: greenColor,
+                    width: 0,
+                  ),
+                ),
+                contentPadding: EdgeInsets.only(right: 20, left: 20),
+                fillColor: greenColor,
+                filled: true,
+                hintTextDirection: TextDirection.rtl,
+                hintText: 'اسم رمزارز خودتون رو سرچ کنید',
+                hintStyle: TextStyle(
+                  fontFamily: 'mrb',
+                  fontSize: 14,
+                  color: blackColor,
+                ),
+              ),
             ),
           ),
-          automaticallyImplyLeading: false,
-        ),
-        backgroundColor: blackColor,
-        body: ListView.builder(
-          itemBuilder: (context, index) {
-            return _getListTile(
-              widget.cryptoList![index],
-              index,
-            );
-          },
-        ),
+          Visibility(
+            visible: isLoading,
+            child: Text(
+              '...در حال دریافت اطلاعات رمز ارزها',
+              style: TextStyle(
+                fontFamily: "mrb",
+                color: greenColor,
+              ),
+            ),
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              backgroundColor: greenColor,
+              key: _refreshIndicatorKey,
+              color: blackColor,
+              strokeWidth: 4.0,
+              onRefresh: () async {
+                List<CryptoList> freshData = await _getData();
+                setState(() {
+                  widget.cryptoList = freshData;
+                });
+                inputController.text = '';
+              },
+              child: ListView.builder(
+                itemCount: widget.cryptoList!.length,
+                itemBuilder: (context, index) {
+                  return _getListTile(
+                    widget.cryptoList![index],
+                    index,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -86,6 +174,7 @@ class _CryptoListPageState extends State<CryptoListPage> {
             crypto.rank.toString(),
             style: TextStyle(
               color: greyColor,
+              fontSize: 17,
             ),
           ),
         ),
