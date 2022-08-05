@@ -1,3 +1,4 @@
+import 'package:crypto_vip/data/constant/constants.dart';
 import 'package:crypto_vip/model/crypto_list.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -22,18 +23,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: blackColor,
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/logo.png'),
-            SizedBox(
-              height: 10,
-            ),
-            SpinKitWave(
-              color: Colors.green,
-            )
-          ],
-        ));
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Image.asset('assets/images/logo.png'),
+        SizedBox(
+          height: 10,
+        ),
+        SpinKitWave(
+          color: greenColor,
+          size: 30,
+        )
+      ],
+    ));
   }
 
   void _getData() async {
@@ -47,6 +50,7 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(
         builder: (_) => CryptoListPage(
           cryptoList: cryptoList,
+          getData: _getData,
         ),
       ),
     );
