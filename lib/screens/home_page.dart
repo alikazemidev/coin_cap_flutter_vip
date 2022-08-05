@@ -23,23 +23,23 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blackColor,
+        backgroundColor: blackColor,
         body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset('assets/images/logo.png'),
-        SizedBox(
-          height: 10,
-        ),
-        SpinKitWave(
-          color: greenColor,
-          size: 30,
-        )
-      ],
-    ));
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/images/logo.png'),
+            SizedBox(
+              height: 10,
+            ),
+            SpinKitWave(
+              color: greenColor,
+              size: 30,
+            )
+          ],
+        ));
   }
 
-  void _getData() async {
+  Future<void> _getData() async {
     var response = await Dio().get('https://api.coincap.io/v2/assets');
     List<CryptoList> cryptoList = response.data["data"]
         .map<CryptoList>((jsonData) => CryptoList.fromMapJson(jsonData))
